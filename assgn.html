@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Fetch and Display Data in Table Format</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <script>
+    angular.module('myApp', [])
+      .controller('myController', function($http) {
+        var vm = this;
+        vm.testList = [];
+
+        $http.get('https://uat.utopiatech.in:4520/panel/gettestlist?org_id=3')
+          .then(function(response) {
+            if (response.data.statusCode === 200 && response.data.status === 'success') {
+              vm.testList = response.data.result;
+            }
+          })
+          .catch(function(error) {
+            console.log(error);
+          });
+      });
+  </script>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th, td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body ng-app="myApp">
+  <div ng-controller="myController as ctrl">
+    <table>
+        <thead>
+          <tr>
+              <th>Panel Name</th>
+              <th>MAC ID</th>
+              <th>Lat</th>
+              <th>Long</th>
+              <th>Location</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat = "testItem in ctrl.testList">
+            <td>{{testItem.panel_name}}</td>
+            <td>{{testItem.mac_id}}</td>
+            <td>{{testItem.Lat}}</td>
+            <td>{{testItem.Lng}}</td>
+            <td>{{Location_Icon}}</td>
+          </tr>
+        </tbody>
+      </table>
+
+  </div>
+</body>
+</html>

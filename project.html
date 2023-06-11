@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Assignement</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script
+      src="https://kit.fontawesome.com/115a3979ee.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <script>
+      angular
+        .module("myApp", [])
+        .controller("myController", function ($scope, $timeout, $http) {
+          $scope.myHeader = "Hello!";
+          $scope.show = false;
+          $scope.selectedPanel = null;
+
+          $timeout(function () {
+            $scope.myHeader = "Welcome to the Assignment";
+          }, 2000);
+
+          var vm = this;
+          vm.testList = [];
+
+          $http
+            .get("https://uat.utopiatech.in:4520/panel/gettestlist?org_id=3")
+            .then(function (response) {
+              if (
+                response.data.statusCode === 200 &&
+                response.data.status === "success"
+              ) {
+                console.log(response.data.result);
+                vm.testList = response.data.result;
+              }
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+
+          $scope.openSidebar = function (data) {
+            $scope.selectedPanel = data;
+            $scope.show = true;
+          };
+
+          $scope.openMapSidebar = function (lat, long) {
+            $scope.latitude = lat;
+            $scope.longitude = long;
+            $scope.showmap = true;
+          };
+        });
+    </script>
+
+    <style>
+
+        body{
+            height: 100vh;
+            /* background: linear-gradient(225deg, rgb(255, 174, 1),rgb(239, 200, 101),rgb(239, 232, 215)); */
+            background: linear-gradient(45deg,#355070,#6D597A,rgb(243, 240, 234));
+            background-repeat: no-repeat;
+            font-size: 1.1rem;
+        }
+
+      .tables {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly;
+        align-items: center;
+      }
+
+      h1 {
+        text-align: center;
+        margin: 20px auto 50px;
+      }
+
+      table {
+        border: 1px solid black;
+        margin: auto;
+        background-color: #EAAC8B;
+        color: BLACK;
+
+      }
+
+      thead{
+        background-color: #215ea7;
+        color: white;
+        font-weight: 400;
+      }
+
+
+      th,
+      td {
+        border: 1px solid #000000;
+        padding: 8px;
+        text-align: left;
+      }
+
+      .map{
+        background-color: #355070;
+        color: white;
+        padding: 1rem;
+      }
+
+      @media screen and (max-width: 480px) {
+        .tables {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: center;
+
+  }
+}
+
+    </style>
+  </head>
+  <body ng-app="myApp">
+    <div ng-controller="myController as ctrl">
+      <h1>{{myHeader}}</h1>
+      <div class="tables">
+        <div class="sidebar" *ngIf="selectedPanel" ng-show="show">
+          <table>
+            <thead>
+              <td>Panel</td>
+              <td>R Phase</td>
+            </thead>
+            <tbody>
+              <tr>
+                <td>R Phase Voltage Status</td>
+                <td>{{ selectedPanel.r_volt_status }}</td>
+              </tr>
+              <tr>
+                <td>MCB Status</td>
+                <td>{{ selectedPanel.r_mcb_status }}</td>
+              </tr>
+              <tr>
+                <td>Load Status</td>
+                <td>{{ selectedPanel.r_load_status }}</td>
+              </tr>
+              <tr>
+                <td>PF Status</td>
+                <td>{{ selectedPanel.r_pf_status }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <table>
+            <thead>
+              <tr>
+                <th>Panel Name</th>
+                <th>MAC ID</th>
+                <th>Lat</th>
+                <th>Long</th>
+                <th>Location</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="x in ctrl.testList">
+                <td ng-click="openSidebar(x)">{{x.panel_name + " " + key }}</td>
+                <td>{{x.mac_id}}</td>
+                <td>{{x.Lat}}</td>
+                <td>{{x.Lng}}</td>
+                <td
+                  ng-click="openMapSidebar(x.Lat, x.Lng)"
+                  style="text-align: center"
+                >
+                  <i class="fa-solid fa-location-dot"></i>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div ng-show="showmap">
+          <p class="map">
+            Display map with Latitude : {{latitude}} and Longitude :
+            {{longitude}}
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
